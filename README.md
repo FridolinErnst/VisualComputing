@@ -1,3 +1,33 @@
+# Build this repository just like you would build the repository from LearnOpenGL
+# Make sure that depending on your verions you change the first 2 Lines of the CMakeLists files to version 4.0 instead of 3.0, like this:
+
+cmake_minimum_required (VERSION 4.0)
+cmake_policy(VERSION 4.0)
+
+Make sure to insert the path to the Dinosaur Points File at this file in line 150
+YOUR_PATH_TO\LearnOpenGL\src\3.model_loading\1.model_loading\model_loading.cpp
+
+This reposoitory changed the model_loading.cpp, model_loading.fs and model_loading.vs files in the path YOUR_PATH_TO\LearnOpenGL\src\3.model_loading\1.model_loading
+
+and it made some changes here
+
+
+        modified:   .gitignore
+        modified:   CMakeLists.txt
+        modified:   README.md
+        modified:   src/1.getting_started/1.1.hello_window/hello_window.cpp
+        modified:   src/1.getting_started/2.3.hello_triangle_exercise1/hello_triangle_exercise1.cpp
+        modified:   src/2.lighting/2.1.basic_lighting_diffuse/basic_lighting_diffuse.cpp
+        modified:   src/3.model_loading/1.model_loading/1.model_loading.fs
+        modified:   src/3.model_loading/1.model_loading/1.model_loading.vs
+        modified:   src/3.model_loading/1.model_loading/model_loading.cpp
+
+
+
+
+
+
+# Below is the learnOpenGL read me
 # learnopengl.com code repository
 Contains code samples for all chapters of Learn OpenGL and [https://learnopengl.com](https://learnopengl.com). 
 

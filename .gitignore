@@ -2,3 +2,31 @@
 bin/
 build/
 out/
+
+# Ignore build directories
+/build/
+/bin/
+/CMakeFiles/
+/cmake-build-*/
+
+# Ignore CMake-generated files
+CMakeCache.txt
+Makefile
+cmake_install.cmake
+
+# Ignore compiled binaries
+*.o
+*.obj
+*.exe
+*.out
+*.dll
+*.so
+*.a
+*.lib
+
+# VSCode
+.vscode/
+
+# Mac/Windows fluff
+.DS_Store
+Thumbs.db
