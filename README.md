@@ -23,7 +23,7 @@ and it made some changes here
         modified:   src/3.model_loading/1.model_loading/model_loading.cpp
 
 
-
+The Dino Images are in the DinoImages folder at the root.
 
 
 
