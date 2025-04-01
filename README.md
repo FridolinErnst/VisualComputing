@@ -4,8 +4,10 @@
 cmake_minimum_required (VERSION 4.0)
 cmake_policy(VERSION 4.0)
 
-Make sure to insert the path to the Dinosaur Points File at this file in line 150
+Make sure to insert the path to the Dinosaur Points File at this file in line 168
+Also make sure that the first line is the number of points! I removed the comment from my files.
 YOUR_PATH_TO\LearnOpenGL\src\3.model_loading\1.model_loading\model_loading.cpp
+
 
 This reposoitory changed the model_loading.cpp, model_loading.fs and model_loading.vs files in the path YOUR_PATH_TO\LearnOpenGL\src\3.model_loading\1.model_loading
 
@@ -25,6 +27,7 @@ and it made some changes here
 
 The Dino Images are in the DinoImages folder at the root.
 
+The report as well with the name Task 1.
 
 
 # Below is the learnOpenGL read me

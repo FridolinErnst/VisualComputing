@@ -21,6 +21,11 @@ struct PointData {
     float nx, ny, nz;    // Normal (optional)
 };
 
+
+/*
+Then we define a function to load the point cloud. We inspect the file and see  that it contains the (x, y, z) coordinates, (r, g, b) colors, and (nx, ny, nz) normals for each point. 
+We removed the comment that indicates this, which was not necessary and we could have just skipped that line, but it ended up working that way.
+*/
 std::vector<PointData> LoadPTS(const std::string& filename)
 {
     std::ifstream file(filename);
@@ -74,7 +79,11 @@ std::vector<PointData> LoadPTS(const std::string& filename)
     return points;
 }
 
-
+/*
+We go on to define callback functions for the GLFWwindow to resize the window and to track mouse and keyboard input. 
+Furthermore, we set the screen size, initialize the camera with a position, define variables to track the mouse position and define some timing variables so our 
+updates and movement is frame independent.
+*/
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -95,6 +104,15 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 
+
+
+/*
+Now we enter the main function, where we start off by initializing GLFW and creating the window with GLFW.
+Then we set the current thread to use this OpenGL context (also referred to as state), which is required before calling any OpenGL functions. 
+We then register the callback functions to our GLFW window. The functions are defined after the main function at the end of the file. 
+We also load all the actual OpenGL functions from the driver and enable depth testing, so we make sure that closer objects visually
+occlude farther ones and don’t end up with a flat image.
+*/
 int main()
 {
     // glfw: initialize and configure
@@ -147,7 +165,7 @@ int main()
 
     // Load the .pts file
     // Enter your path to the point source and make sure that the first line is the number of total points and from the second line on its the points (no comment at top)
-    std::string path = "C:/Users/YOURNAME/Documents/Uni/VisualComputing/task 1/saurier-normal.pts";
+    std::string path = "C:/Users/Fridolin/Documents/Uni/VisualComputing/task 1/saurier-normal.pts";
     std::cout << "Path: " << path << std::endl;
     auto points = LoadPTS(path);
 
@@ -171,15 +189,23 @@ int main()
 
     // Create and configure the VAO/VBO
     unsigned int VAO, VBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+    glGenVertexArrays(1, &VAO); //VAO (Vertex Array Object) stores how to interpret your vertex data.
 
+    glGenBuffers(1, &VBO); //VBO (Vertex Buffer Object) holds the actual vertex data on the GPU.
+
+    // here we bind them, since OpenGL is a state machine. We do not pass data directly to glDrawArrays, but set up the context and then OpenGL uses this context
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    //This tells OpenGL to copy the point cloud data into GPU memory.
     glBufferData(GL_ARRAY_BUFFER,
         points.size() * sizeof(PointData),
         points.data(),
-        GL_STATIC_DRAW);
+        GL_STATIC_DRAW); // static basically means I’m uploading this data once and I won’t change it later — just draw it.
+
+
+
+    // here we make sure that the data gets correctly interpeted, what each attribute means (position, color, normal, etc.)
 
     // Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(PointData), (void*)offsetof(PointData, x));
@@ -189,18 +215,18 @@ int main()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(PointData), (void*)offsetof(PointData, r));
     glEnableVertexAttribArray(1);
 
-    // Normal attribute (optional)
+    // Normal attribute
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(PointData), (void*)offsetof(PointData, nx));
     glEnableVertexAttribArray(2);
 
+
+    // here we unbind the buffer and VAO to avoid accidental changes later
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    // draw in wireframe
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-     
     
     // Enable programmatic control of point size
+    //This allows the vertex shader to set point sizes dynamically via gl_PointSize, which is needed if we want scalable point sprites (e.g., using a uniform like uPointSize)
     glEnable(GL_PROGRAM_POINT_SIZE);
 
     // render loop
@@ -209,16 +235,16 @@ int main()
     {
         // per-frame time logic
         // --------------------
-        float currentFrame = static_cast<float>(glfwGetTime());
-        deltaTime = currentFrame - lastFrame;
+        float currentFrame = static_cast<float>(glfwGetTime()); // we get the time since program started
+        deltaTime = currentFrame - lastFrame; // we get how much time passed between the frames
         lastFrame = currentFrame;
 
         // input
         // -----
-        processInput(window);
+        processInput(window); // calls the custom functino below to move camera with WASD and use EXIT to quit the window
 
         // 3. Adjust the point size using UP/DOWN keys
-        static float pointSize = 10.0f; // setting here is fine its only set in the first entrance to 10
+        static float pointSize = 10.0f; // setting here is fine its only set in the first entrance to 10, static also keeps the value persistent between frames
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
             pointSize += 0.1f;
         }
@@ -229,11 +255,15 @@ int main()
 
         // render
         // ------
+        //prepares the screen for the next frame. Clears both color and depth buffers (so we don't get leftover pixels or Z-fighting from last frame).
+
+
         glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // don't forget to enable shader before setting uniforms
         ourShader.use();
+        // we send uniforms to the GPU, the size is used in the VS
         ourShader.setFloat("uPointSize", pointSize);
         // here we set our single light and add colour to it
         ourShader.setVec3("lightPos", glm::vec3(0.0f, 10.0f, 0.0f));
@@ -244,15 +274,15 @@ int main()
 
         // Set transform uniforms (projection, view, model)
 
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom),
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), //projection: 3D -> 2D perspective projection
             (float)SCR_WIDTH / (float)SCR_HEIGHT,
             0.1f, 100.0f);
-        glm::mat4 view = camera.GetViewMatrix();
+        glm::mat4 view = camera.GetViewMatrix(); // view: camera transform 
         glm::mat4 model = glm::mat4(1.0f);
 
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
-        ourShader.setMat4("model", model);
+        ourShader.setMat4("model", model); //model: object’s position/rotation/scale in the world (here, identity matrix)
 
         // Now draw the points
         glBindVertexArray(VAO);
